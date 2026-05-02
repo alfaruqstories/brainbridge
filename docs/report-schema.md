@@ -15,6 +15,9 @@ Top-level fields:
 - `graph`: nodes and edges generated from wikilinks.
 - `canvases`: Canvas inventory.
 - `bases`: Bases inventory.
+- `markdownFallbacks`: static fallback notes generated from plugin-dependent Markdown.
+- `tasks`: Markdown checkbox tasks with source path and line number.
+- `properties`: YAML frontmatter properties by note.
 
 `wikilinks` includes both Obsidian wikilinks and local Markdown links. The `syntax` field identifies the source syntax, and `blockReference` captures Obsidian-style `#^block-id` references when present.
 

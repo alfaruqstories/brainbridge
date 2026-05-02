@@ -14,11 +14,12 @@ Use this skill when a user wants to audit, bridge, export, or explain Obsidian v
    - Obsidian-specific state
    - broken links
    - missing attachments
+   - task and property indexes
    - generated fallback files
 
 ## Meaning of Artifacts
 
-Generated artifacts are sidecar compatibility files. They do not mutate the source vault or fully emulate Obsidian plugins; they provide static reports, indexes, graph data, and Markdown fallbacks that other editors, viewers, agents, and static-site tools can read.
+Generated artifacts are sidecar compatibility files. They do not mutate the source vault or fully emulate Obsidian plugins; they provide static reports, indexes, graph data, task/property extracts, and Markdown fallbacks that other editors, viewers, agents, and static-site tools can read.
 
 ## Safety
 

@@ -13,8 +13,9 @@ BrainBridge is CLI-first with a reusable core library.
 2. Classify files into Markdown, attachment, Canvas, Base, Obsidian config, plugin manifest, or other.
 3. Parse Markdown for wikilinks, local Markdown links, embeds, block references, plugin blocks, and app-specific syntax.
 4. Resolve internal links against notes and embedded files.
-5. Inventory Obsidian config and community plugins.
-6. Generate reports, graph artifacts, backlink indexes, attachment indexes, Canvas fallbacks, Bases fallbacks, and fallback notes.
+5. Index portable frontmatter properties and Markdown checkbox tasks.
+6. Inventory Obsidian config, community plugins, and plugin state files.
+7. Generate reports, graph artifacts, backlink indexes, attachment indexes, task/property indexes, Markdown fallbacks, Canvas fallbacks, Bases fallbacks, and fallback notes.
 
 ## Safety
 

@@ -45,8 +45,13 @@ export function renderReportMarkdown(report: VaultReport): string {
     "- `graph.csv`",
     "- `backlinks.md`",
     "- `attachments-index.md`",
+    "- `tasks-index.md`",
+    "- `properties-index.md`",
     "- `plugin-dependencies.md`",
     "- `degrades-outside-obsidian.md`",
+    "- `markdown-fallbacks/**/*.md`",
+    "- `canvas-fallbacks/**/*.md`",
+    "- `base-fallbacks/**/*.md`",
     ""
   ];
 
@@ -100,6 +105,34 @@ export function renderAttachmentsIndex(report: VaultReport): string {
   return `${lines.join("\n").trim()}\n`;
 }
 
+export function renderTasksIndex(report: VaultReport): string {
+  const lines = ["# Tasks Index", ""];
+  if (report.tasks.length === 0) {
+    lines.push("No Markdown task checkboxes detected.");
+  } else {
+    for (const task of report.tasks) {
+      lines.push(`- [${task.completed ? "x" : " "}] ${task.text} (${task.source}:${task.line})`);
+    }
+  }
+  return `${lines.join("\n").trim()}\n`;
+}
+
+export function renderPropertiesIndex(report: VaultReport): string {
+  const lines = ["# Properties Index", ""];
+  if (report.properties.length === 0) {
+    lines.push("No YAML frontmatter properties detected.");
+  } else {
+    for (const item of report.properties) {
+      lines.push(`## ${item.path}`, "");
+      for (const [key, value] of Object.entries(item.frontmatter)) {
+        lines.push(`- ${key}: ${formatPropertyValue(value)}`);
+      }
+      lines.push("");
+    }
+  }
+  return `${lines.join("\n").trim()}\n`;
+}
+
 export function renderPluginDependencies(report: VaultReport): string {
   const lines = ["# Plugin Dependencies", ""];
   if (report.plugins.length === 0) {
@@ -128,7 +161,8 @@ export function renderCanvasFallbacks(report: VaultReport): Map<string, string> 
     } else {
       for (const node of canvas.nodes) {
         const suffix = node.file ? ` -> [[${node.file}]]` : node.text ? `: ${node.text.replace(/\s+/g, " ").trim()}` : "";
-        lines.push(`- ${node.label} (${node.type})${suffix}`);
+        const location = renderCanvasNodeLocation(node);
+        lines.push(`- ${node.label} (${node.type})${suffix}${location}`);
       }
     }
 
@@ -162,6 +196,14 @@ export function renderCanvasFallbacks(report: VaultReport): Map<string, string> 
   return outputs;
 }
 
+export function renderMarkdownFallbacks(report: VaultReport): Map<string, string> {
+  const outputs = new Map<string, string>();
+  for (const fallback of report.markdownFallbacks) {
+    outputs.set(fallback.path, fallback.content);
+  }
+  return outputs;
+}
+
 export function renderBaseFallbacks(report: VaultReport): Map<string, string> {
   const outputs = new Map<string, string>();
   for (const base of report.bases) {
@@ -186,4 +228,20 @@ function renderFindingList(findings: Finding[]): string[] {
     const pathPart = finding.path ? ` (${finding.path})` : "";
     return `- [${finding.severity}] ${finding.title}${pathPart}: ${finding.detail}`;
   });
+}
+
+function renderCanvasNodeLocation(node: { x?: number; y?: number; width?: number; height?: number }): string {
+  const hasPosition = typeof node.x === "number" && typeof node.y === "number";
+  const hasSize = typeof node.width === "number" && typeof node.height === "number";
+  if (!hasPosition && !hasSize) return "";
+  const parts = [];
+  if (hasPosition) parts.push(`x=${node.x}, y=${node.y}`);
+  if (hasSize) parts.push(`w=${node.width}, h=${node.height}`);
+  return ` (${parts.join("; ")})`;
+}
+
+function formatPropertyValue(value: unknown): string {
+  if (Array.isArray(value)) return value.map((item) => String(item)).join(", ");
+  if (value === null) return "null";
+  return String(value);
 }

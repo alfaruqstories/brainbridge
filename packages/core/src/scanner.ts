@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { parseSimpleYaml } from "./frontmatter.js";
+import { parseFrontmatter, parseSimpleYaml } from "./frontmatter.js";
 import { ATTACHMENT_EXTENSIONS, IGNORED_DIRS, MARKDOWN_EXTENSIONS, relativePosix, toPosix } from "./path-utils.js";
 import {
   attachmentReferencesFromLinks,
@@ -10,7 +10,20 @@ import {
   graphFromLinks,
   resolveWikiLinks
 } from "./links.js";
-import type { BaseInfo, CanvasEdgeInfo, CanvasInfo, CanvasNodeInfo, Finding, PluginInfo, ScanOptions, VaultFile, VaultReport } from "./types.js";
+import type {
+  BaseInfo,
+  CanvasEdgeInfo,
+  CanvasInfo,
+  CanvasNodeInfo,
+  Finding,
+  MarkdownFallback,
+  NoteProperties,
+  PluginInfo,
+  ScanOptions,
+  TaskItem,
+  VaultFile,
+  VaultReport
+} from "./types.js";
 
 interface WalkedFile {
   absolutePath: string;
@@ -36,6 +49,9 @@ export async function scanVault(vaultPath: string, options: ScanOptions = {}): P
   const links = [];
   const canvases: CanvasInfo[] = [];
   const bases: BaseInfo[] = [];
+  const markdownFallbacks: MarkdownFallback[] = [];
+  const tasks: TaskItem[] = [];
+  const properties: NoteProperties[] = [];
 
   for (const file of walkedFiles) {
     if (isMarkdown(file.relativePath)) {
@@ -47,6 +63,13 @@ export async function scanVault(vaultPath: string, options: ScanOptions = {}): P
       });
       links.push(...extracted);
       findings.push(...contentFindings(file.relativePath, content));
+      const fallback = buildMarkdownFallback(file.relativePath, content);
+      if (fallback) markdownFallbacks.push(fallback);
+      tasks.push(...extractTaskItems(file.relativePath, content));
+      const parsed = parseFrontmatter(content);
+      if (Object.keys(parsed.frontmatter).length > 0) {
+        properties.push({ path: file.relativePath, frontmatter: parsed.frontmatter });
+      }
     }
 
     if (file.relativePath.endsWith(".canvas")) {
@@ -95,7 +118,10 @@ export async function scanVault(vaultPath: string, options: ScanOptions = {}): P
     attachmentReferences,
     graph,
     canvases,
-    bases
+    bases,
+    markdownFallbacks,
+    tasks,
+    properties
   };
 }
 
@@ -176,7 +202,17 @@ async function inspectCanvas(absolutePath: string, rel: string, findings: Findin
   const content = await fs.readFile(absolutePath, "utf8");
   try {
     const data = JSON.parse(content) as {
-      nodes?: Array<{ id?: string; type?: string; file?: string; text?: string; label?: string }>;
+      nodes?: Array<{
+        id?: string;
+        type?: string;
+        file?: string;
+        text?: string;
+        label?: string;
+        x?: number;
+        y?: number;
+        width?: number;
+        height?: number;
+      }>;
       edges?: Array<{ id?: string; fromNode?: string; toNode?: string; label?: string }>;
     };
     const nodes = Array.isArray(data.nodes) ? data.nodes : [];
@@ -191,7 +227,11 @@ async function inspectCanvas(absolutePath: string, rel: string, findings: Findin
         type,
         label,
         file,
-        text
+        text,
+        x: typeof node.x === "number" ? node.x : undefined,
+        y: typeof node.y === "number" ? node.y : undefined,
+        width: typeof node.width === "number" ? node.width : undefined,
+        height: typeof node.height === "number" ? node.height : undefined
       };
     });
     const fallbackEdges: CanvasEdgeInfo[] = edges
@@ -283,6 +323,27 @@ function obsidianFindings(files: VaultFile[]): Finding[] {
     });
   }
 
+  const externalStateFiles: Array<[RegExp, string, string]> = [
+    [/^\.obsidian\/sync\.json$/, "Obsidian Sync settings", "Obsidian Sync state is service-backed and cannot be reproduced by static Markdown export."],
+    [/^\.obsidian\/plugins\/[^/]+\/data\.json$/, "Plugin data store", "Plugin data files may contain state that only the plugin knows how to interpret."],
+    [/^\.obsidian\/plugins\/[^/]+\/main\.js$/, "Plugin runtime code", "Plugin JavaScript runs only inside Obsidian and is not portable to normal Markdown tools."],
+    [/^\.obsidian\/plugins\/[^/]+\/styles\.css$/, "Plugin stylesheet", "Plugin styles may affect Obsidian rendering but will not automatically apply elsewhere."]
+  ];
+
+  for (const file of files) {
+    for (const [pattern, title, detail] of externalStateFiles) {
+      if (pattern.test(file.path)) {
+        findings.push({
+          classification: "external_state",
+          severity: "warning",
+          title,
+          path: file.path,
+          detail
+        });
+      }
+    }
+  }
+
   return findings;
 }
 
@@ -344,7 +405,118 @@ function scorePortability(findings: Finding[]): number {
   for (const finding of findings) {
     if (finding.classification === "plugin_dependent") score -= finding.severity === "risk" ? 8 : 4;
     if (finding.classification === "obsidian_specific") score -= finding.severity === "risk" ? 6 : 2;
+    if (finding.classification === "external_state") score -= finding.severity === "risk" ? 8 : 5;
     if (finding.severity === "risk") score -= 4;
   }
   return Math.max(0, Math.min(100, score));
+}
+
+function buildMarkdownFallback(rel: string, content: string): MarkdownFallback | undefined {
+  const reasons = new Set<string>();
+  let fallback = content;
+
+  fallback = fallback.replace(/```dataview\b([\s\S]*?)```/gi, (_match, query: string) => {
+    reasons.add("Dataview query converted to a static query note.");
+    return [
+      "> [!note] Dataview query",
+      "> This query needs the Dataview plugin in Obsidian. BrainBridge preserved the query text for other Markdown tools.",
+      ">",
+      ...fenceForQuote(String(query).trim() || "(empty query)")
+    ].join("\n");
+  });
+
+  fallback = fallback.replace(/```tasks\b([\s\S]*?)```/gi, (_match, query: string) => {
+    reasons.add("Tasks query converted to a static query note.");
+    return [
+      "> [!note] Tasks query",
+      "> This query needs the Tasks plugin in Obsidian. BrainBridge preserved the query text for other Markdown tools.",
+      ">",
+      ...fenceForQuote(String(query).trim() || "(empty query)")
+    ].join("\n");
+  });
+
+  fallback = fallback.replace(/<%([\s\S]*?)%>/g, (_match, expression: string) => {
+    reasons.add("Templater expression escaped as readable text.");
+    return `\`Templater: ${String(expression).trim().replace(/\s+/g, " ")}\``;
+  });
+
+  fallback = fallback.replace(/obsidian:\/\/[^\s)]+/gi, (uri: string) => {
+    reasons.add("Obsidian URI converted to inline code.");
+    const trailing = /[.,;:!?]+$/.exec(uri)?.[0] ?? "";
+    const cleanUri = trailing ? uri.slice(0, -trailing.length) : uri;
+    return `\`${cleanUri}\`${trailing}`;
+  });
+
+  if (/excalidraw/i.test(content)) {
+    reasons.add("Excalidraw content summarized for Markdown readers.");
+    fallback += renderExcalidrawSummary(content);
+  }
+
+  if (reasons.size === 0 || fallback === content) return undefined;
+  return {
+    path: rel,
+    reasons: [...reasons],
+    content: [
+      `# ${rel}`,
+      "",
+      "> [!info] BrainBridge fallback",
+      ...[...reasons].map((reason) => `> - ${reason}`),
+      "",
+      fallback.trim(),
+      ""
+    ].join("\n")
+  };
+}
+
+function extractTaskItems(rel: string, content: string): TaskItem[] {
+  const tasks: TaskItem[] = [];
+  const lines = content.split(/\r?\n/);
+  lines.forEach((line, index) => {
+    const match = /^\s*[-*]\s+\[([ xX])\]\s+(.*)$/.exec(line);
+    if (!match) return;
+    tasks.push({
+      source: rel,
+      line: index + 1,
+      text: match[2]?.trim() ?? "",
+      completed: (match[1] ?? "").toLowerCase() === "x"
+    });
+  });
+  return tasks;
+}
+
+function fenceForQuote(value: string): string[] {
+  const lines = ["```", ...value.split(/\r?\n/), "```"];
+  return lines.map((line) => `> ${line}`);
+}
+
+function renderExcalidrawSummary(content: string): string {
+  const textElements = extractExcalidrawTextElements(content);
+  const lines = ["", "", "## Excalidraw Text Elements", ""];
+  if (textElements.length === 0) {
+    lines.push("- No text elements detected in the Markdown representation.");
+  } else {
+    for (const element of textElements) lines.push(`- ${element}`);
+  }
+  return lines.join("\n");
+}
+
+function extractExcalidrawTextElements(content: string): string[] {
+  const jsonMatch = /"elements"\s*:\s*(\[[\s\S]*?\])\s*,\s*"appState"/.exec(content);
+  if (jsonMatch) {
+    try {
+      const elements = JSON.parse(jsonMatch[1] ?? "[]") as Array<{ type?: string; text?: string }>;
+      return elements
+        .filter((element) => element.type === "text" && typeof element.text === "string")
+        .map((element) => element.text?.trim() ?? "")
+        .filter(Boolean);
+    } catch {
+      // Fall through to Markdown-style extraction.
+    }
+  }
+
+  const textSection = /# Text Elements\s*([\s\S]*?)(?:\n# |\n%%|$)/i.exec(content)?.[1] ?? "";
+  return textSection
+    .split(/\r?\n/)
+    .map((line) => line.replace(/\^[A-Za-z0-9_-]+$/, "").trim())
+    .filter(Boolean);
 }

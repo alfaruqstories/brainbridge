@@ -10,6 +10,7 @@ test("scans a markdown-only vault and builds graph data", async () => {
   assert.equal(report.summary.markdownFiles, 2);
   assert.equal(report.graph.edges.length, 2);
   assert.equal(report.summary.portabilityScore, 100);
+  assert.deepEqual(report.properties[0]?.frontmatter, { tags: ["home"] });
 });
 
 test("detects plugin-heavy vault risks", async () => {
@@ -19,4 +20,10 @@ test("detects plugin-heavy vault risks", async () => {
   assert.ok(report.findings.some((finding) => finding.title === "Canvas file"));
   assert.ok(report.findings.some((finding) => finding.title === "Bases view"));
   assert.ok(report.findings.some((finding) => finding.title === "Broken wikilink"));
+  assert.ok(report.findings.some((finding) => finding.title === "Plugin data store"));
+  assert.ok(report.markdownFallbacks.some((fallback) => fallback.path === "Dashboard.md"));
+  assert.ok(report.markdownFallbacks.some((fallback) => fallback.content.includes("Dataview query")));
+  assert.ok(report.markdownFallbacks.some((fallback) => fallback.content.includes("Portable sketch label")));
+  assert.ok(report.tasks.some((task) => task.text === "Write docs" && !task.completed));
+  assert.ok(report.tasks.some((task) => task.text === "Pick name" && task.completed));
 });

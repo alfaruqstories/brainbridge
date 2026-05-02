@@ -86,6 +86,10 @@ export interface CanvasNodeInfo {
   label: string;
   file?: string;
   text?: string;
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
 }
 
 export interface CanvasEdgeInfo {
@@ -93,6 +97,24 @@ export interface CanvasEdgeInfo {
   fromNode: string;
   toNode: string;
   label?: string;
+}
+
+export interface MarkdownFallback {
+  path: string;
+  reasons: string[];
+  content: string;
+}
+
+export interface TaskItem {
+  source: string;
+  line: number;
+  text: string;
+  completed: boolean;
+}
+
+export interface NoteProperties {
+  path: string;
+  frontmatter: Record<string, unknown>;
 }
 
 export interface VaultReport {
@@ -116,6 +138,9 @@ export interface VaultReport {
   };
   canvases: CanvasInfo[];
   bases: BaseInfo[];
+  markdownFallbacks: MarkdownFallback[];
+  tasks: TaskItem[];
+  properties: NoteProperties[];
 }
 
 export interface ScanOptions {

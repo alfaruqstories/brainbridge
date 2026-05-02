@@ -39,6 +39,10 @@ test("bridge writes fallback artifacts", async () => {
   assert.ok(files.includes("brainbridge-report.json"));
   assert.ok(files.includes("graph.json"));
   assert.ok(files.includes("backlinks.md"));
+  assert.ok(files.includes("tasks-index.md"));
+  assert.ok(files.includes("properties-index.md"));
+  assert.ok(files.includes(path.join("markdown-fallbacks", "Dashboard.md")));
+  assert.ok(files.includes(path.join("markdown-fallbacks", "Sketch.excalidraw.md")));
   assert.ok(files.includes(path.join("base-fallbacks", "bases", "Tasks.base.md")));
   assert.ok(files.includes(path.join("canvas-fallbacks", "boards", "Map.canvas.md")));
 });

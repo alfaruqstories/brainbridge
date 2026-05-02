@@ -7,8 +7,11 @@ import {
   renderCanvasFallbacks,
   renderDegradationReport,
   renderGraphCsv,
+  renderMarkdownFallbacks,
   renderPluginDependencies,
-  renderReportMarkdown
+  renderPropertiesIndex,
+  renderReportMarkdown,
+  renderTasksIndex
 } from "./render.js";
 import type { VaultReport, WriteArtifactsOptions } from "./types.js";
 
@@ -23,8 +26,14 @@ export async function writeBridgeArtifacts(report: VaultReport, options: WriteAr
   await write(outDir, "graph.csv", renderGraphCsv(report.graph.edges), written);
   await write(outDir, "backlinks.md", renderBacklinks(report), written);
   await write(outDir, "attachments-index.md", renderAttachmentsIndex(report), written);
+  await write(outDir, "tasks-index.md", renderTasksIndex(report), written);
+  await write(outDir, "properties-index.md", renderPropertiesIndex(report), written);
   await write(outDir, "plugin-dependencies.md", renderPluginDependencies(report), written);
   await write(outDir, "degrades-outside-obsidian.md", renderDegradationReport(report), written);
+
+  for (const [relativePath, content] of renderMarkdownFallbacks(report)) {
+    await write(outDir, path.join("markdown-fallbacks", relativePath), content, written);
+  }
 
   for (const [relativePath, content] of renderCanvasFallbacks(report)) {
     await write(outDir, path.join("canvas-fallbacks", relativePath), content, written);

@@ -19,7 +19,7 @@
   },
   "scripts": {
     "build": "pnpm -r build",
-    "test": "pnpm build && node --test \"packages/*/dist/**/*.test.js\"",
+    "test": "pnpm build && node --test packages/core/dist/test/*.test.js packages/cli/dist/test/*.test.js",
     "check:privacy": "node scripts/check-private-strings.mjs"
   },
   "keywords": [

@@ -1,0 +1,36 @@
+{
+  "name": "brainbridge-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Make Obsidian vaults understandable everywhere else.",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alfaruqstories/brainbridge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/alfaruqstories/brainbridge/issues"
+  },
+  "homepage": "https://github.com/alfaruqstories/brainbridge#readme",
+  "packageManager": "pnpm@9.15.4",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm build && node --test \"packages/*/dist/**/*.test.js\"",
+    "check:privacy": "node scripts/check-private-strings.mjs"
+  },
+  "keywords": [
+    "obsidian",
+    "markdown",
+    "interoperability",
+    "vault",
+    "portable"
+  ],
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "typescript": "^5.8.3"
+  }
+}

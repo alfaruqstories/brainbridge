@@ -22,29 +22,27 @@ It is built first for Obsidian vaults, but the goal is broader: make Markdown-ba
 ## Quickstart
 
 ```bash
+git clone https://github.com/alfaruqstories/brainbridge.git
+cd brainbridge
 pnpm install
 pnpm build
-
-cd /path/to/notes
-brainbridge audit
-brainbridge export --out ./brainbridge-export
 ```
 
-If you are running from this repository during development:
+Run BrainBridge from the cloned repo against a notes folder:
 
 ```bash
-node /path/to/BrainBridge/packages/cli/dist/src/index.js audit /path/to/vault
-node /path/to/BrainBridge/packages/cli/dist/src/index.js export /path/to/vault --out ./brainbridge-export
+pnpm brainbridge audit /path/to/notes
+pnpm brainbridge export /path/to/notes --out ./brainbridge-export
 ```
 
 ## Commands
 
 ```bash
-brainbridge audit [vault] [--out <dir>]
-brainbridge bridge [vault] --out <dir>
-brainbridge graph [vault] --out <dir>
-brainbridge export [vault] --out <dir>
-brainbridge --version
+pnpm brainbridge audit [vault] [--out <dir>]
+pnpm brainbridge bridge [vault] --out <dir>
+pnpm brainbridge graph [vault] --out <dir>
+pnpm brainbridge export [vault] --out <dir>
+pnpm brainbridge --version
 ```
 
 - `audit`: report what works and what degrades outside the source app.
@@ -52,7 +50,7 @@ brainbridge --version
 - `graph`: emit only graph and backlink artifacts.
 - `export`: copy portable notes and attachments plus generated fallbacks into a bundle.
 
-When `[vault]` is omitted, BrainBridge scans the current directory.
+When `[vault]` is omitted, BrainBridge scans the current directory. In repo-first usage, that means either pass `/path/to/notes` explicitly or run the command from the notes folder with an absolute path to this checkout.
 
 ## Generated Artifacts
 
@@ -103,10 +101,10 @@ Use BrainBridge from https://github.com/alfaruqstories/brainbridge to audit this
 
 Clone the repo or use the local checkout if it already exists. Install and build it with `pnpm install` and `pnpm build`.
 
-Run the CLI from the built repo against the target notes folder:
+Run the repo-local CLI against the target notes folder:
 
-`node packages/cli/dist/src/index.js audit /path/to/notes`
-`node packages/cli/dist/src/index.js export /path/to/notes --out ./brainbridge-export`
+`pnpm brainbridge audit /path/to/notes`
+`pnpm brainbridge export /path/to/notes --out ./brainbridge-export`
 
 Review the generated report, plugin dependencies, task/property indexes, graph files, and Markdown fallbacks.
 

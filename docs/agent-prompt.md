@@ -9,8 +9,8 @@ Use BrainBridge from https://github.com/alfaruqstories/brainbridge as a read-onl
 
 1. Clone the repo, or use the local checkout if it already exists.
 2. Install and build it with `pnpm install` and `pnpm build`.
-3. Run `node packages/cli/dist/src/index.js audit /path/to/notes` to identify what works across tools and what degrades.
-4. Run `node packages/cli/dist/src/index.js export /path/to/notes --out ./brainbridge-export` to create a portable bundle with Markdown notes, attachments, graph data, backlinks, task/property indexes, plugin reports, and static fallbacks.
+3. Run `pnpm brainbridge audit /path/to/notes` from the BrainBridge repo to identify what works across tools and what degrades.
+4. Run `pnpm brainbridge export /path/to/notes --out ./brainbridge-export` from the BrainBridge repo to create a portable bundle with Markdown notes, attachments, graph data, backlinks, task/property indexes, plugin reports, and static fallbacks.
 5. Review the highest-impact files first:
    - `BrainBridge Report.md`
    - `degrades-outside-obsidian.md`

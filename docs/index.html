@@ -528,10 +528,10 @@
 
 Clone the repo or use the local checkout if it already exists. Install and build it with `pnpm install` and `pnpm build`.
 
-Run the CLI from the built repo against the target notes folder:
+Run the repo-local CLI against the target notes folder:
 
-`node packages/cli/dist/src/index.js audit /path/to/notes`
-`node packages/cli/dist/src/index.js export /path/to/notes --out ./brainbridge-export`
+`pnpm brainbridge audit /path/to/notes`
+`pnpm brainbridge export /path/to/notes --out ./brainbridge-export`
 
 Review the generated report, plugin dependencies, task/property indexes, graph files, and Markdown fallbacks.
 

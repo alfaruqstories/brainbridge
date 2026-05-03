@@ -1,61 +1,60 @@
 # BrainBridge
 
-BrainBridge makes Obsidian vaults understandable everywhere else.
+Your notes should work anywhere.
 
-It scans a vault, identifies Obsidian-specific behavior, and generates portable fallback artifacts for Markdown tools, agents, static sites, search systems, and editors that do not run Obsidian.
+BrainBridge is a CLI for turning an Obsidian vault into portable Markdown context. It scans a vault, identifies Obsidian-specific behavior, and generates reports, indexes, graph data, and static fallbacks that other Markdown editors, search tools, static sites, and AI agents can read.
 
-BrainBridge is not anti-Obsidian. It treats Obsidian as a powerful interface over files, then makes the file-backed knowledge easier to reuse outside that interface.
+[Landing page](https://alfaruqstories.github.io/brainbridge/) · [Agent prompt](./docs/agent-prompt.md)
 
-## Install
+## Why
+
+Obsidian is a strong interface over plain files, but many useful vault features are not plain Markdown:
+
+- wikilinks, embeds, backlinks, and graph views
+- Canvas and Bases files
+- Dataview, Tasks, Templater, Kanban, and Excalidraw conventions
+- plugin configuration, sync state, and local plugin data
+
+BrainBridge keeps the source vault read-only by default and creates a portable layer beside it.
+
+## Quickstart
 
 ```bash
 pnpm install
 pnpm build
+
+cd /path/to/obsidian-vault
+brainbridge audit
+brainbridge export --out ./brainbridge-export
+```
+
+If you are running from this repository during development:
+
+```bash
+node /path/to/BrainBridge/packages/cli/dist/src/index.js audit /path/to/vault
+node /path/to/BrainBridge/packages/cli/dist/src/index.js export /path/to/vault --out ./brainbridge-export
 ```
 
 ## Commands
 
 ```bash
-brainbridge audit
-brainbridge audit <vault>
-brainbridge audit <vault> --out <dir>
-brainbridge bridge <vault> --out <dir>
-brainbridge graph <vault> --out <dir>
-brainbridge export <vault> --out <dir>
+brainbridge audit [vault] [--out <dir>]
+brainbridge bridge [vault] --out <dir>
+brainbridge graph [vault] --out <dir>
+brainbridge export [vault] --out <dir>
+brainbridge --version
 ```
 
-When `<vault>` is omitted, BrainBridge scans the current directory. That makes the common workflow:
+- `audit`: report what works and what degrades outside Obsidian.
+- `bridge`: generate sidecar compatibility artifacts without copying the vault.
+- `graph`: emit only graph and backlink artifacts.
+- `export`: copy portable notes and attachments plus generated fallbacks into a bundle.
 
-```bash
-cd /path/to/obsidian-vault
-brainbridge export --out ./brainbridge-export
-```
-
-`audit` reports what will and will not work outside Obsidian.
-
-`bridge` generates fallback artifacts without copying the whole vault.
-
-`graph` emits graph and backlink artifacts only.
-
-`export` creates a portable bundle with notes, attachments, fallbacks, and a degradation report.
-
-V1 never mutates the source vault.
-
-## What Portable Artifacts Mean
-
-BrainBridge does not turn every Obsidian-only feature into native behavior in every Markdown app. Instead, it generates readable fallback files and indexes that make the vault easier to inspect elsewhere:
-
-- graph and backlink files for tools without Obsidian's live graph
-- attachment indexes for embedded files
-- task and property indexes generated from portable Markdown and YAML frontmatter
-- plugin dependency and degradation reports for Dataview, Tasks, Templater, Kanban, Excalidraw, Canvas, and Bases
-- Markdown fallbacks that preserve Dataview and Tasks queries as readable static notes
-- Canvas and Bases fallback Markdown so non-Obsidian viewers have a static representation
-- an optional export bundle that copies portable notes and attachments next to those generated fallbacks
-
-Use `bridge` when you want sidecar compatibility artifacts. Use `export` when you want a portable bundle to open or ship elsewhere.
+When `[vault]` is omitted, BrainBridge scans the current directory.
 
 ## Generated Artifacts
+
+BrainBridge writes plain files:
 
 - `BrainBridge Report.md`
 - `brainbridge-report.json`
@@ -71,13 +70,45 @@ Use `bridge` when you want sidecar compatibility artifacts. Use `export` when yo
 - `canvas-fallbacks/**/*.md`
 - `base-fallbacks/**/*.md`
 
+## What Portable Means
+
+BrainBridge does not execute Obsidian plugins or make every Obsidian feature native in every Markdown app. It preserves what can be represented as static files:
+
+- Markdown note bodies
+- YAML frontmatter properties
+- normal Markdown links and Obsidian wikilinks
+- task checkboxes
+- graph and backlink relationships
+- attachment references
+- readable static fallbacks for plugin-heavy notes
+
+It also reports what cannot be reproduced exactly, such as Dataview query execution, Tasks query execution, Templater execution, live Canvas layout behavior, Bases formulas, plugin runtimes, and sync-backed state.
+
 ## Classification Model
 
-- `portable`: Markdown, YAML frontmatter, attachments, normal links.
-- `regenerable`: backlinks, graph views, tag indexes, property indexes, task indexes, static plugin-query fallbacks.
-- `obsidian_specific`: `.obsidian`, workspace state, Canvas, Bases, hotkeys, snippets, themes.
-- `plugin_dependent`: Dataview, Tasks, Kanban, Templater, Readwise, Web Clipper, Excalidraw.
-- `external_state`: sync metadata, OAuth-backed services, plugin databases, local caches.
+- `portable`: Markdown, YAML frontmatter, attachments, and normal links.
+- `regenerable`: backlinks, graph views, property indexes, task indexes, and static plugin-query fallbacks.
+- `obsidian_specific`: `.obsidian`, workspace state, Canvas, Bases, hotkeys, snippets, and themes.
+- `plugin_dependent`: Dataview, Tasks, Kanban, Templater, Readwise, Web Clipper, and Excalidraw.
+- `external_state`: sync metadata, OAuth-backed services, plugin databases, and local caches.
+
+## Agent Prompt
+
+Use this short prompt with an AI coding agent:
+
+```text
+Use BrainBridge to audit this Obsidian vault and generate a portable export.
+
+Run `brainbridge audit`, then `brainbridge export --out ./brainbridge-export`.
+
+Review the generated report, plugin dependencies, task/property indexes, graph files, and Markdown fallbacks.
+
+Do not mutate the source vault unless explicitly asked.
+
+Explain what still depends on Obsidian and recommend portable Markdown alternatives.
+```
+
+The longer version lives in [docs/agent-prompt.md](./docs/agent-prompt.md).
 
 ## Development
 
@@ -87,6 +118,10 @@ pnpm build
 pnpm test
 pnpm check:privacy
 ```
+
+## Status
+
+BrainBridge is early. It is useful for read-only audits and portable exports, but it is not an Obsidian plugin runtime.
 
 ## License
 

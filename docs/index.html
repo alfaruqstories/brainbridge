@@ -160,43 +160,30 @@
         text-align: center;
       }
 
-      .flow {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        margin-bottom: 14px;
-        color: var(--muted);
-        font-size: 14px;
-      }
-
-      .flow-item {
-        color: var(--ink);
-        font-weight: 720;
-      }
-
-      .arrow {
-        color: var(--accent-dark);
-        font-weight: 800;
-      }
-
       .artifacts {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 10px;
+        gap: 12px;
       }
 
       .artifact-card {
         border: 1px solid var(--line);
         border-radius: 8px;
-        min-height: 92px;
+        min-height: 154px;
         display: grid;
-        align-content: center;
-        gap: 6px;
+        gap: 12px;
         padding: 14px;
         background: var(--panel);
         text-align: left;
+      }
+
+      .artifact-visual {
+        min-height: 70px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        background: var(--soft);
+        overflow: hidden;
       }
 
       .artifact-card strong {
@@ -208,10 +195,118 @@
         font-size: 13px;
       }
 
-      .command {
-        margin: 14px auto 0;
+      .artifact-body {
+        display: grid;
+        gap: 4px;
+      }
+
+      .mini-report {
+        width: 78%;
+        display: grid;
+        gap: 6px;
+      }
+
+      .mini-line {
+        height: 7px;
+        border-radius: 999px;
+        background: #c9ddd7;
+      }
+
+      .mini-line:nth-child(2) {
+        width: 72%;
+      }
+
+      .mini-line:nth-child(3) {
+        width: 48%;
+        background: #78b9ad;
+      }
+
+      .mini-graph {
+        position: relative;
+        width: 88%;
+        height: 58px;
+      }
+
+      .mini-edge {
+        position: absolute;
+        height: 1px;
+        background: #8fbdb5;
+        transform-origin: left center;
+      }
+
+      .mini-edge.one {
+        width: 70px;
+        left: 18px;
+        top: 28px;
+        transform: rotate(-18deg);
+      }
+
+      .mini-edge.two {
+        width: 64px;
+        left: 74px;
+        top: 24px;
+        transform: rotate(24deg);
+      }
+
+      .mini-node {
+        position: absolute;
+        width: 13px;
+        height: 13px;
+        border-radius: 999px;
+        background: var(--accent);
+      }
+
+      .mini-node.a {
+        left: 12px;
+        top: 28px;
+      }
+
+      .mini-node.b {
+        left: 76px;
+        top: 6px;
+      }
+
+      .mini-node.c {
+        right: 12px;
+        bottom: 8px;
+      }
+
+      .mini-tasks,
+      .mini-props,
+      .mini-embeds,
+      .mini-fallback {
+        width: 82%;
+        display: grid;
+        gap: 7px;
         color: var(--muted);
-        text-align: center;
+        font: 12px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+
+      .mini-task,
+      .mini-prop,
+      .mini-file {
+        min-height: 18px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        padding: 0 7px;
+        background: #fff;
+      }
+
+      .mini-prop {
+        justify-content: space-between;
+      }
+
+      .mini-file.missing {
+        color: #9f3b3b;
+        background: #fff5f3;
+      }
+
+      .mini-fallback code {
+        border-radius: 6px;
+        padding: 5px 7px;
+        background: #fff;
+        color: var(--muted);
       }
 
       pre {
@@ -300,7 +395,7 @@
         }
 
         .artifact-card {
-          min-height: 76px;
+          min-height: 138px;
         }
 
         footer {
@@ -340,45 +435,84 @@
             <button class="button" id="copyPromptHero" type="button">Copy agent prompt</button>
           </div>
 
-          <div class="visual" aria-label="BrainBridge export flow">
-            <div class="flow">
-              <span class="flow-item">Markdown knowledge base</span>
-              <span class="arrow">-></span>
-              <span class="flow-item">BrainBridge export</span>
-              <span class="arrow">-></span>
-              <span class="flow-item">Open anywhere</span>
-            </div>
-
+          <div class="visual" aria-label="BrainBridge generated artifacts">
             <div class="artifacts" aria-label="Generated artifacts">
               <div class="artifact-card">
-                <strong>Report</strong>
-                <span>What works, what degrades, and what needs attention.</span>
+                <div class="artifact-visual">
+                  <div class="mini-report" aria-hidden="true">
+                    <span class="mini-line"></span>
+                    <span class="mini-line"></span>
+                    <span class="mini-line"></span>
+                  </div>
+                </div>
+                <div class="artifact-body">
+                  <strong>Report</strong>
+                  <span>What works, what degrades, and what needs attention.</span>
+                </div>
               </div>
               <div class="artifact-card">
-                <strong>Graph</strong>
-                <span>Portable nodes, edges, backlinks, and unresolved links.</span>
+                <div class="artifact-visual">
+                  <div class="mini-graph" aria-hidden="true">
+                    <span class="mini-edge one"></span>
+                    <span class="mini-edge two"></span>
+                    <span class="mini-node a"></span>
+                    <span class="mini-node b"></span>
+                    <span class="mini-node c"></span>
+                  </div>
+                </div>
+                <div class="artifact-body">
+                  <strong>Graph</strong>
+                  <span>Portable nodes, edges, backlinks, and unresolved links.</span>
+                </div>
               </div>
               <div class="artifact-card">
-                <strong>Tasks</strong>
-                <span>Checkboxes and task state extracted into an index.</span>
+                <div class="artifact-visual">
+                  <div class="mini-tasks" aria-hidden="true">
+                    <span class="mini-task">[ ] Review links</span>
+                    <span class="mini-task">[x] Export context</span>
+                  </div>
+                </div>
+                <div class="artifact-body">
+                  <strong>Tasks</strong>
+                  <span>Checkboxes and task state extracted into an index.</span>
+                </div>
               </div>
               <div class="artifact-card">
-                <strong>Properties</strong>
-                <span>YAML frontmatter collected into a readable index.</span>
+                <div class="artifact-visual">
+                  <div class="mini-props" aria-hidden="true">
+                    <span class="mini-prop"><span>status</span><span>active</span></span>
+                    <span class="mini-prop"><span>tags</span><span>notes</span></span>
+                  </div>
+                </div>
+                <div class="artifact-body">
+                  <strong>Properties</strong>
+                  <span>YAML frontmatter collected into a readable index.</span>
+                </div>
               </div>
               <div class="artifact-card">
-                <strong>Embeds</strong>
-                <span>Attachment references and missing embeds made visible.</span>
+                <div class="artifact-visual">
+                  <div class="mini-embeds" aria-hidden="true">
+                    <span class="mini-file">diagram.png</span>
+                    <span class="mini-file missing">missing.pdf</span>
+                  </div>
+                </div>
+                <div class="artifact-body">
+                  <strong>Embeds</strong>
+                  <span>Attachment references and missing embeds made visible.</span>
+                </div>
               </div>
               <div class="artifact-card">
-                <strong>Fallbacks</strong>
-                <span>Static Markdown for app-only views and plugin-heavy notes.</span>
+                <div class="artifact-visual">
+                  <div class="mini-fallback" aria-hidden="true">
+                    <code>dataview -> md</code>
+                    <code>canvas -> md</code>
+                  </div>
+                </div>
+                <div class="artifact-body">
+                  <strong>Fallbacks</strong>
+                  <span>Static Markdown for app-only views and plugin-heavy notes.</span>
+                </div>
               </div>
-            </div>
-
-            <div class="command" aria-label="BrainBridge commands">
-              <pre><code>brainbridge audit
-brainbridge export --out ./brainbridge-export</code></pre>
             </div>
           </div>
           <div class="status" id="copyStatus"></div>
@@ -390,9 +524,14 @@ brainbridge export --out ./brainbridge-export</code></pre>
       </footer>
     </div>
 
-    <pre class="prompt" id="promptText">Use BrainBridge to audit this Markdown knowledge base and generate a portable export.
+    <pre class="prompt" id="promptText">Use BrainBridge from https://github.com/alfaruqstories/brainbridge to audit this Markdown knowledge base and generate a portable export.
 
-Run `brainbridge audit`, then `brainbridge export --out ./brainbridge-export`.
+Clone the repo or use the local checkout if it already exists. Install and build it with `pnpm install` and `pnpm build`.
+
+Run the CLI from the built repo against the target notes folder:
+
+`node packages/cli/dist/src/index.js audit /path/to/notes`
+`node packages/cli/dist/src/index.js export /path/to/notes --out ./brainbridge-export`
 
 Review the generated report, plugin dependencies, task/property indexes, graph files, and Markdown fallbacks.
 

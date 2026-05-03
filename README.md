@@ -99,9 +99,14 @@ It also reports what cannot be reproduced exactly, such as Dataview query execut
 Use this short prompt with an AI coding agent:
 
 ```text
-Use BrainBridge to audit this Markdown knowledge base and generate a portable export.
+Use BrainBridge from https://github.com/alfaruqstories/brainbridge to audit this Markdown knowledge base and generate a portable export.
 
-Run `brainbridge audit`, then `brainbridge export --out ./brainbridge-export`.
+Clone the repo or use the local checkout if it already exists. Install and build it with `pnpm install` and `pnpm build`.
+
+Run the CLI from the built repo against the target notes folder:
+
+`node packages/cli/dist/src/index.js audit /path/to/notes`
+`node packages/cli/dist/src/index.js export /path/to/notes --out ./brainbridge-export`
 
 Review the generated report, plugin dependencies, task/property indexes, graph files, and Markdown fallbacks.
 

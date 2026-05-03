@@ -1,15 +1,17 @@
 # BrainBridge Agent Prompt
 
-Use this prompt with a coding agent when you want it to inspect or improve an Obsidian vault interoperability workflow with BrainBridge.
+Use this prompt with a coding agent when you want it to inspect or improve a Markdown knowledge base portability workflow with BrainBridge.
 
 ```text
-You are helping me make an Obsidian vault portable outside Obsidian.
+You are helping me make a Markdown knowledge base portable across tools.
 
-Use BrainBridge as a read-only compatibility tool:
+Use BrainBridge from https://github.com/alfaruqstories/brainbridge as a read-only compatibility tool:
 
-1. Run `brainbridge audit` from the vault root to identify what works outside Obsidian and what degrades.
-2. Run `brainbridge export --out ./brainbridge-export` to create a portable bundle with Markdown notes, attachments, graph data, backlinks, task/property indexes, plugin reports, and static fallbacks.
-3. Review the highest-impact files first:
+1. Clone the repo, or use the local checkout if it already exists.
+2. Install and build it with `pnpm install` and `pnpm build`.
+3. Run `node packages/cli/dist/src/index.js audit /path/to/notes` to identify what works across tools and what degrades.
+4. Run `node packages/cli/dist/src/index.js export /path/to/notes --out ./brainbridge-export` to create a portable bundle with Markdown notes, attachments, graph data, backlinks, task/property indexes, plugin reports, and static fallbacks.
+5. Review the highest-impact files first:
    - `BrainBridge Report.md`
    - `degrades-outside-obsidian.md`
    - `plugin-dependencies.md`
@@ -18,8 +20,8 @@ Use BrainBridge as a read-only compatibility tool:
    - `markdown-fallbacks/`
    - `canvas-fallbacks/`
    - `base-fallbacks/`
-4. Do not mutate the source vault unless I explicitly ask for an opt-in migration.
-5. Explain which Obsidian-only features cannot be reproduced exactly, and recommend portable Markdown alternatives.
+6. Do not mutate the source notes unless I explicitly ask for an opt-in migration.
+7. Explain which app-specific features cannot be reproduced exactly, and recommend portable Markdown alternatives.
 
-Goal: make the vault understandable in Markdown editors, static sites, search systems, and AI agents that do not run Obsidian plugins.
+Goal: make the notes understandable in Markdown editors, static sites, search systems, and AI agents that do not run the source app's plugins.
 ```

@@ -2,7 +2,7 @@
 
 Use this skill when a user wants to audit, bridge, export, or explain Markdown knowledge-base portability with BrainBridge.
 
-BrainBridge is repo-first for now. Do not assume it is globally installed or published to npm. Use the cloned repository from https://github.com/alfaruqstories/brainbridge, then run `pnpm install` and `pnpm build` before invoking the CLI with `pnpm brainbridge`.
+BrainBridge is repo-first for now. Do not assume it is globally installed or published to npm. Use the cloned repository from https://github.com/alfaruqstories/brainbridge, then run `pnpm install` before invoking the CLI with `pnpm brainbridge`. The repo-local command builds before running.
 
 ## Workflow
 

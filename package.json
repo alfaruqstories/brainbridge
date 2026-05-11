@@ -2,7 +2,7 @@
   "name": "brainbridge-workspace",
   "version": "0.1.0",
   "private": true,
-  "description": "Make Obsidian vaults understandable everywhere else.",
+  "description": "Make Markdown knowledge bases portable across tools.",
   "license": "MIT",
   "type": "module",
   "repository": {
@@ -19,15 +19,14 @@
   },
   "scripts": {
     "build": "pnpm -r build",
-    "brainbridge": "node packages/cli/dist/src/index.js",
+    "brainbridge": "pnpm -s build && node packages/cli/dist/src/index.js",
     "test": "pnpm build && node --test packages/core/dist/test/*.test.js packages/cli/dist/test/*.test.js",
     "check:privacy": "node scripts/check-private-strings.mjs"
   },
   "keywords": [
-    "obsidian",
     "markdown",
     "interoperability",
-    "vault",
+    "knowledge-base",
     "portable"
   ],
   "devDependencies": {

@@ -4,7 +4,7 @@ Make your second brain portable.
 
 BrainBridge is a CLI for turning Markdown knowledge bases into portable context. It scans notes, identifies app-specific behavior, and generates reports, indexes, graph data, and static fallbacks that other Markdown editors, search tools, static sites, and AI agents can read.
 
-[Landing page](https://alfaruqstories.github.io/brainbridge/) · [Agent prompt](./docs/agent-prompt.md)
+[Landing page](https://alfaruqstories.github.io/brainbridge/) · [Agent prompt](./docs/agent-prompt.md) · [Strategy](./docs/strategy.md)
 
 ## Why
 
@@ -15,7 +15,7 @@ Markdown notes mostly work everywhere. The trouble starts when a knowledge base 
 - Dataview, Tasks, Templater, Kanban, and Excalidraw conventions
 - plugin configuration, sync state, and local plugin data
 
-BrainBridge keeps the source vault read-only by default and creates a portable layer beside it.
+BrainBridge keeps the source notes read-only by default and creates a portable layer beside them.
 
 It is built first for Obsidian vaults, but the goal is broader: make Markdown-based second brains easier to move between tools.
 
@@ -25,7 +25,6 @@ It is built first for Obsidian vaults, but the goal is broader: make Markdown-ba
 git clone https://github.com/alfaruqstories/brainbridge.git
 cd brainbridge
 pnpm install
-pnpm build
 ```
 
 Run BrainBridge from the cloned repo against a notes folder:
@@ -38,19 +37,19 @@ pnpm brainbridge export /path/to/notes --out ./brainbridge-export
 ## Commands
 
 ```bash
-pnpm brainbridge audit [vault] [--out <dir>]
-pnpm brainbridge bridge [vault] --out <dir>
-pnpm brainbridge graph [vault] --out <dir>
-pnpm brainbridge export [vault] --out <dir>
+pnpm brainbridge audit [notes-path] [--out <dir>]
+pnpm brainbridge bridge [notes-path] --out <dir>
+pnpm brainbridge graph [notes-path] --out <dir>
+pnpm brainbridge export [notes-path] --out <dir>
 pnpm brainbridge --version
 ```
 
 - `audit`: report what works and what degrades outside the source app.
-- `bridge`: generate sidecar compatibility artifacts without copying the vault.
+- `bridge`: generate sidecar compatibility artifacts without copying the notes.
 - `graph`: emit only graph and backlink artifacts.
 - `export`: copy portable notes and attachments plus generated fallbacks into a bundle.
 
-When `[vault]` is omitted, BrainBridge scans the current directory. In repo-first usage, that means either pass `/path/to/notes` explicitly or run the command from the notes folder with an absolute path to this checkout.
+When `[notes-path]` is omitted, BrainBridge scans the current directory. In repo-first usage, passing `/path/to/notes` explicitly is clearer.
 
 ## Generated Artifacts
 
@@ -99,7 +98,7 @@ Use this short prompt with an AI coding agent:
 ```text
 Use BrainBridge from https://github.com/alfaruqstories/brainbridge to audit this Markdown knowledge base and generate a portable export.
 
-Clone the repo or use the local checkout if it already exists. Install and build it with `pnpm install` and `pnpm build`.
+Clone the repo or use the local checkout if it already exists. Install dependencies with `pnpm install`.
 
 Run the repo-local CLI against the target notes folder:
 
@@ -108,7 +107,7 @@ Run the repo-local CLI against the target notes folder:
 
 Review the generated report, plugin dependencies, task/property indexes, graph files, and Markdown fallbacks.
 
-Do not mutate the source vault unless explicitly asked.
+Do not mutate the source notes unless explicitly asked.
 
 Explain what still depends on app-specific behavior and recommend portable Markdown alternatives.
 ```

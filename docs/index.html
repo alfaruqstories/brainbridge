@@ -526,16 +526,16 @@
 
     <pre class="prompt" id="promptText">Use BrainBridge from https://github.com/alfaruqstories/brainbridge to audit this Markdown knowledge base and generate a portable export.
 
-Clone the repo or use the local checkout if it already exists. Install and build it with `pnpm install` and `pnpm build`.
+Clone the repo or use the local checkout if it already exists. Install dependencies with `pnpm install`.
 
-Run the repo-local CLI against the target notes folder:
+Run the repo-local CLI against the target notes folder. The command builds before running:
 
 `pnpm brainbridge audit /path/to/notes`
 `pnpm brainbridge export /path/to/notes --out ./brainbridge-export`
 
 Review the generated report, plugin dependencies, task/property indexes, graph files, and Markdown fallbacks.
 
-Do not mutate the source vault unless explicitly asked.
+Do not mutate the source notes unless explicitly asked.
 
 Explain what still depends on app-specific behavior and recommend portable Markdown alternatives.</pre>
 

@@ -1,10 +1,10 @@
 # V1 Scope
 
-BrainBridge V1 focuses on making vaults understandable outside Obsidian.
+BrainBridge V1 focuses on making Markdown knowledge bases understandable across tools. It is built first around Obsidian-style portability gaps because those gaps are common and concrete.
 
 ## Included
 
-- Read-only vault scanning.
+- Read-only notes-folder scanning.
 - Markdown wikilink and embed extraction.
 - Local Markdown link and image extraction.
 - Broken link and missing attachment detection.
@@ -20,7 +20,7 @@ BrainBridge V1 focuses on making vaults understandable outside Obsidian.
 
 ## Not Included
 
-- Source vault mutation.
+- Source notes mutation.
 - Full Dataview or Tasks query evaluation.
 - Templater execution.
 - Full Bases formula evaluation.

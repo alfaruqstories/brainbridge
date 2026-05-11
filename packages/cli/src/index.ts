@@ -11,7 +11,7 @@ const VERSION = "0.1.0";
 
 interface ParsedArgs {
   command?: string;
-  vault?: string;
+  notesPath?: string;
   outDir?: string;
   help: boolean;
   version: boolean;
@@ -29,17 +29,17 @@ async function main(argv: string[]): Promise<number> {
     return args.command ? 0 : 1;
   }
 
-  if (!args.vault) {
-    console.error("Missing vault path.");
+  if (!args.notesPath) {
+    console.error("Missing notes path.");
     printHelp();
     return 1;
   }
 
-  const vaultPath = path.resolve(args.vault);
+  const notesPath = path.resolve(args.notesPath);
 
   try {
     if (args.command === "audit") {
-      const report = await scanVault(vaultPath);
+      const report = await scanVault(notesPath);
       if (args.outDir) {
         const written = await writeBridgeArtifacts(report, { outDir: args.outDir });
         printSummary(report, written);
@@ -51,7 +51,7 @@ async function main(argv: string[]): Promise<number> {
 
     if (args.command === "bridge") {
       const outDir = requireOutDir(args);
-      const report = await scanVault(vaultPath);
+      const report = await scanVault(notesPath);
       const written = await writeBridgeArtifacts(report, { outDir });
       printSummary(report, written);
       return 0;
@@ -59,7 +59,7 @@ async function main(argv: string[]): Promise<number> {
 
     if (args.command === "graph") {
       const outDir = requireOutDir(args);
-      const report = await scanVault(vaultPath);
+      const report = await scanVault(notesPath);
       const written = await writeGraphArtifacts(report, outDir);
       printSummary(report, written);
       return 0;
@@ -67,7 +67,7 @@ async function main(argv: string[]): Promise<number> {
 
     if (args.command === "export") {
       const outDir = requireOutDir(args);
-      const report = await scanVault(vaultPath);
+      const report = await scanVault(notesPath);
       const written = await writeBridgeArtifacts(report, { outDir, includeVaultCopy: true });
       printSummary(report, written);
       return 0;
@@ -84,7 +84,7 @@ async function main(argv: string[]): Promise<number> {
 
 function parseArgs(argv: string[]): ParsedArgs {
   const [command, ...rest] = argv;
-  let vault: string | undefined;
+  let notesPath: string | undefined;
   let outDir: string | undefined;
   let help = false;
   let version = false;
@@ -96,15 +96,15 @@ function parseArgs(argv: string[]): ParsedArgs {
     else if (arg === "--out") {
       outDir = rest[index + 1];
       index += 1;
-    } else if (!arg.startsWith("-") && !vault) {
-      vault = arg;
+    } else if (!arg.startsWith("-") && !notesPath) {
+      notesPath = arg;
     }
   }
 
   if (command === "--version" || command === "-v") version = true;
   if (command === "--help" || command === "-h") help = true;
 
-  return { command, vault: vault ?? process.cwd(), outDir, help, version };
+  return { command, notesPath: notesPath ?? process.cwd(), outDir, help, version };
 }
 
 function requireOutDir(args: ParsedArgs): string {
@@ -124,20 +124,20 @@ function printSummary(report: Awaited<ReturnType<typeof scanVault>>, written: st
 function printHelp(): void {
   console.log(`BrainBridge
 
-Make Obsidian vaults understandable everywhere else.
+Make Markdown knowledge bases portable across tools.
 
 Usage:
-  brainbridge audit [vault] [--out <dir>]
-  brainbridge bridge [vault] --out <dir>
-  brainbridge graph [vault] --out <dir>
-  brainbridge export [vault] --out <dir>
+  brainbridge audit [notes-path] [--out <dir>]
+  brainbridge bridge [notes-path] --out <dir>
+  brainbridge graph [notes-path] --out <dir>
+  brainbridge export [notes-path] --out <dir>
   brainbridge --version
 
 Commands:
-  audit   Report what will and will not work outside Obsidian.
-  bridge  Generate portable fallback artifacts without copying the vault.
+  audit   Report what will and will not work across Markdown tools.
+  bridge  Generate portable fallback artifacts without copying the notes.
   graph   Generate graph.json, graph.csv, and backlinks.md.
-  export  Copy portable vault files and generated fallback artifacts.
+  export  Copy portable note files and generated fallback artifacts.
 `);
 }
 

@@ -1,0 +1,36 @@
+{
+  "name": "brainbridge-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Make Markdown knowledge bases portable across tools.",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alfaruqstories/brainbridge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/alfaruqstories/brainbridge/issues"
+  },
+  "homepage": "https://github.com/alfaruqstories/brainbridge#readme",
+  "packageManager": "pnpm@9.15.4",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "brainbridge": "pnpm -s build && node packages/cli/dist/src/index.js",
+    "test": "pnpm build && node --test packages/core/dist/test/*.test.js packages/cli/dist/test/*.test.js",
+    "check:privacy": "node scripts/check-private-strings.mjs"
+  },
+  "keywords": [
+    "markdown",
+    "interoperability",
+    "knowledge-base",
+    "portable"
+  ],
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "typescript": "^5.8.3"
+  }
+}

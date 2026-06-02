@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="BrainBridge makes your second brain portable with Markdown reports, indexes, graph data, and static fallbacks.">
+    <title>BrainBridge</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #111816;
+        --muted: #5a6863;
+        --line: #dce6e2;
+        --paper: #fbfdfc;
+        --panel: #ffffff;
+        --soft: #eef6f3;
+        --accent: #0f766e;
+        --accent-dark: #115e59;
+        --terminal: #0c1d19;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.5;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .page {
+        min-height: 100vh;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+      }
+
+      .shell {
+        width: min(1040px, calc(100% - 36px));
+        margin: 0 auto;
+      }
+
+      header {
+        border-bottom: 1px solid var(--line);
+      }
+
+      nav {
+        min-height: 62px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 780;
+      }
+
+      .mark {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        background: var(--accent);
+        color: #fff;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .nav-links a:hover,
+      .nav-links a:focus-visible {
+        color: var(--ink);
+      }
+
+      main {
+        display: flex;
+        align-items: center;
+        padding: 34px 0;
+      }
+
+      .hero {
+        text-align: center;
+      }
+
+      h1 {
+        max-width: 900px;
+        margin: 0 auto 14px;
+        font-size: clamp(44px, 8vw, 88px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+
+      .lead {
+        max-width: 720px;
+        margin: 0 auto 22px;
+        color: var(--muted);
+        font-size: clamp(17px, 2vw, 20px);
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+
+      .button {
+        min-height: 42px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 15px;
+        background: var(--panel);
+        color: var(--ink);
+        font-weight: 720;
+        cursor: pointer;
+        transition: border-color 160ms ease, background 160ms ease;
+      }
+
+      .button:hover,
+      .button:focus-visible {
+        border-color: var(--accent);
+      }
+
+      .button.primary {
+        border-color: var(--accent);
+        background: var(--accent);
+        color: #fff;
+      }
+
+      .button.primary:hover,
+      .button.primary:focus-visible {
+        background: var(--accent-dark);
+      }
+
+      .visual {
+        max-width: 900px;
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      .artifacts {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .artifact-card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        min-height: 154px;
+        display: grid;
+        gap: 12px;
+        padding: 14px;
+        background: var(--panel);
+        text-align: left;
+      }
+
+      .artifact-visual {
+        min-height: 70px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        background: var(--soft);
+        overflow: hidden;
+      }
+
+      .artifact-card strong {
+        font-size: 15px;
+      }
+
+      .artifact-card span {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .artifact-body {
+        display: grid;
+        gap: 4px;
+      }
+
+      .mini-report {
+        width: 78%;
+        display: grid;
+        gap: 6px;
+      }
+
+      .mini-line {
+        height: 7px;
+        border-radius: 999px;
+        background: #c9ddd7;
+      }
+
+      .mini-line:nth-child(2) {
+        width: 72%;
+      }
+
+      .mini-line:nth-child(3) {
+        width: 48%;
+        background: #78b9ad;
+      }
+
+      .mini-graph {
+        position: relative;
+        width: 88%;
+        height: 58px;
+      }
+
+      .mini-edge {
+        position: absolute;
+        height: 1px;
+        background: #8fbdb5;
+        transform-origin: left center;
+      }
+
+      .mini-edge.one {
+        width: 70px;
+        left: 18px;
+        top: 28px;
+        transform: rotate(-18deg);
+      }
+
+      .mini-edge.two {
+        width: 64px;
+        left: 74px;
+        top: 24px;
+        transform: rotate(24deg);
+      }
+
+      .mini-node {
+        position: absolute;
+        width: 13px;
+        height: 13px;
+        border-radius: 999px;
+        background: var(--accent);
+      }
+
+      .mini-node.a {
+        left: 12px;
+        top: 28px;
+      }
+
+      .mini-node.b {
+        left: 76px;
+        top: 6px;
+      }
+
+      .mini-node.c {
+        right: 12px;
+        bottom: 8px;
+      }
+
+      .mini-tasks,
+      .mini-props,
+      .mini-embeds,
+      .mini-fallback {
+        width: 82%;
+        display: grid;
+        gap: 7px;
+        color: var(--muted);
+        font: 12px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+
+      .mini-task,
+      .mini-prop,
+      .mini-file {
+        min-height: 18px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        padding: 0 7px;
+        background: #fff;
+      }
+
+      .mini-prop {
+        justify-content: space-between;
+      }
+
+      .mini-file.missing {
+        color: #9f3b3b;
+        background: #fff5f3;
+      }
+
+      .mini-fallback code {
+        border-radius: 6px;
+        padding: 5px 7px;
+        background: #fff;
+        color: var(--muted);
+      }
+
+      pre {
+        margin: 0;
+        overflow-x: auto;
+        padding: 0;
+        color: var(--muted);
+        font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+
+      .prompt {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+      }
+
+      .status {
+        min-height: 20px;
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 14px;
+        text-align: center;
+      }
+
+      footer {
+        border-top: 1px solid var(--line);
+        padding: 18px 0;
+        color: var(--muted);
+        font-size: 14px;
+        text-align: center;
+      }
+
+      @media (max-width: 760px) {
+        main {
+          align-items: start;
+          padding: 30px 0;
+        }
+
+        h1 {
+          font-size: clamp(40px, 13vw, 64px);
+        }
+
+        .lead {
+          font-size: 17px;
+        }
+
+        .artifacts {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 520px) {
+        .shell {
+          width: min(100% - 28px, 1040px);
+        }
+
+        nav {
+          min-height: 58px;
+        }
+
+        .nav-links a:first-child {
+          display: none;
+        }
+
+        .nav-links {
+          gap: 10px;
+        }
+
+        .nav-links .button {
+          min-height: 38px;
+          padding: 0 10px;
+        }
+
+        .actions {
+          gap: 10px;
+        }
+
+        .actions .button {
+          width: 100%;
+        }
+
+        .artifacts {
+          grid-template-columns: 1fr;
+        }
+
+        .artifact-card {
+          min-height: 138px;
+        }
+
+        footer {
+          padding: 14px 0;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <nav class="shell">
+          <a class="brand" href="https://github.com/alfaruqstories/brainbridge">
+            <span class="mark">B</span>
+            <span>BrainBridge</span>
+          </a>
+          <div class="nav-links">
+            <a href="https://github.com/alfaruqstories/brainbridge">GitHub</a>
+            <a href="./agent-prompt.md">Prompt</a>
+            <button class="button" id="copyPrompt" type="button">Copy prompt</button>
+          </div>
+        </nav>
+      </header>
+
+      <main>
+        <div class="shell hero">
+          <h1>Make your second brain portable.</h1>
+          <p class="lead">Your Markdown has context other tools miss: backlinks, graphs, tasks, properties, embeds, plugins, and app-only views. BrainBridge turns that context into portable files.</p>
+          <div class="actions">
+            <a class="button primary" href="https://github.com/alfaruqstories/brainbridge">View on GitHub</a>
+            <button class="button" id="copyPromptHero" type="button">Copy agent prompt</button>
+          </div>
+
+          <div class="visual" aria-label="BrainBridge generated artifacts">
+            <div class="artifacts" aria-label="Generated artifacts">
+              <div class="artifact-card">
+                <div class="artifact-visual">
+                  <div class="mini-report" aria-hidden="true">
+                    <span class="mini-line"></span>
+                    <span class="mini-line"></span>
+                    <span class="mini-line"></span>
+                  </div>
+                </div>
+                <div class="artifact-body">
+                  <strong>Report</strong>
+                  <span>What works, what degrades, and what needs attention.</span>
+                </div>
+              </div>
+              <div class="artifact-card">
+                <div class="artifact-visual">
+                  <div class="mini-graph" aria-hidden="true">
+                    <span class="mini-edge one"></span>
+                    <span class="mini-edge two"></span>
+                    <span class="mini-node a"></span>
+                    <span class="mini-node b"></span>
+                    <span class="mini-node c"></span>
+                  </div>
+                </div>
+                <div class="artifact-body">
+                  <strong>Graph</strong>
+                  <span>Portable nodes, edges, backlinks, and unresolved links.</span>
+                </div>
+              </div>
+              <div class="artifact-card">
+                <div class="artifact-visual">
+                  <div class="mini-tasks" aria-hidden="true">
+                    <span class="mini-task">[ ] Review links</span>
+                    <span class="mini-task">[x] Export context</span>
+                  </div>
+                </div>
+                <div class="artifact-body">
+                  <strong>Tasks</strong>
+                  <span>Checkboxes and task state extracted into an index.</span>
+                </div>
+              </div>
+              <div class="artifact-card">
+                <div class="artifact-visual">
+                  <div class="mini-props" aria-hidden="true">
+                    <span class="mini-prop"><span>status</span><span>active</span></span>
+                    <span class="mini-prop"><span>tags</span><span>notes</span></span>
+                  </div>
+                </div>
+                <div class="artifact-body">
+                  <strong>Properties</strong>
+                  <span>YAML frontmatter collected into a readable index.</span>
+                </div>
+              </div>
+              <div class="artifact-card">
+                <div class="artifact-visual">
+                  <div class="mini-embeds" aria-hidden="true">
+                    <span class="mini-file">diagram.png</span>
+                    <span class="mini-file missing">missing.pdf</span>
+                  </div>
+                </div>
+                <div class="artifact-body">
+                  <strong>Embeds</strong>
+                  <span>Attachment references and missing embeds made visible.</span>
+                </div>
+              </div>
+              <div class="artifact-card">
+                <div class="artifact-visual">
+                  <div class="mini-fallback" aria-hidden="true">
+                    <code>dataview -> md</code>
+                    <code>canvas -> md</code>
+                  </div>
+                </div>
+                <div class="artifact-body">
+                  <strong>Fallbacks</strong>
+                  <span>Static Markdown for app-only views and plugin-heavy notes.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="status" id="copyStatus"></div>
+        </div>
+      </main>
+
+      <footer>
+        <div class="shell">Built first for Obsidian vaults. Useful anywhere Markdown starts depending on app-specific behavior.</div>
+      </footer>
+    </div>
+
+    <pre class="prompt" id="promptText">Use BrainBridge from https://github.com/alfaruqstories/brainbridge to audit this Markdown knowledge base and generate a portable export.
+
+Clone the repo or use the local checkout if it already exists. Install dependencies with `pnpm install`.
+
+Run the repo-local CLI against the target notes folder. The command builds before running:
+
+`pnpm brainbridge audit /path/to/notes`
+`pnpm brainbridge audit /path/to/notes --json`
+`pnpm brainbridge export /path/to/notes --out ./brainbridge-export`
+
+Review the generated report, JSON audit output, plugin dependencies, task/property indexes, graph files, and Markdown fallbacks. The export bundle uses rewritten Markdown links and Markdown fallbacks for Canvas and Bases instead of presenting raw app-specific files as the portable artifact.
+
+Do not mutate the source notes unless explicitly asked.
+
+Explain what still depends on app-specific behavior and recommend portable Markdown alternatives.</pre>
+
+    <script>
+      const buttons = [document.getElementById("copyPrompt"), document.getElementById("copyPromptHero")];
+      const promptText = document.getElementById("promptText");
+      const copyStatus = document.getElementById("copyStatus");
+
+      async function copyPrompt() {
+        const text = promptText.textContent || "";
+        try {
+          await navigator.clipboard.writeText(text);
+          copyStatus.textContent = "Prompt copied.";
+        } catch {
+          copyStatus.textContent = "Open the prompt link and copy it manually.";
+        }
+      }
+
+      buttons.forEach((button) => button.addEventListener("click", copyPrompt));
+    </script>
+  </body>
+</html>

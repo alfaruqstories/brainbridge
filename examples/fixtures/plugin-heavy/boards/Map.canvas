@@ -1,0 +1,29 @@
+{
+  "nodes": [
+    {
+      "id": "a",
+      "type": "file",
+      "file": "Dashboard.md",
+      "x": 0,
+      "y": 0,
+      "width": 400,
+      "height": 300
+    },
+    {
+      "id": "b",
+      "type": "text",
+      "text": "Portable fallback needed",
+      "x": 500,
+      "y": 0,
+      "width": 400,
+      "height": 300
+    }
+  ],
+  "edges": [
+    {
+      "id": "e",
+      "fromNode": "a",
+      "toNode": "b"
+    }
+  ]
+}

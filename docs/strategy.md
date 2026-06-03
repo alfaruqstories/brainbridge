@@ -48,17 +48,17 @@ The repo-local `pnpm brainbridge` command builds before running.
 | Agents may skip the build step. | `pnpm brainbridge` builds before invoking the CLI. |
 | Copy may over-index on Obsidian. | Public copy says Markdown knowledge bases first, Obsidian as first target. |
 | “Portable” may sound like full plugin emulation. | Docs state BrainBridge generates static files and does not execute plugins. |
-| Strategy may be based only on fixtures. | Next validation gate is a real vault test. |
-| Generated output may be technically correct but hard to inspect. | Next product gate is example export and report-quality pass. |
+| Strategy may be based only on fixtures. | Automated fixtures cover known classes; a real notes-folder test remains the next external validation gate. |
+| Generated output may be technically correct but hard to inspect. | CI smoke-tests key generated artifacts for readable content and obvious rendering mistakes. |
 
 ## Validation Gates
 
 The strategy is not fully proven until these pass:
 
 1. Run against at least one real messy notes folder.
-2. Confirm no source files are modified.
-3. Confirm generated artifacts are understandable without Obsidian.
-4. Confirm an agent can follow the repo-first prompt without extra instructions.
+2. Confirm no source files are modified. Covered by fixture tests; still verify once on a real notes folder.
+3. Confirm generated artifacts are understandable without Obsidian. Covered by artifact smoke tests; still verify once on real output.
+4. Confirm an agent can follow the repo-first prompt without extra instructions. Prompt consistency is covered by tests; fresh-agent execution remains external validation.
 5. Improve or remove any artifact that is noisy, misleading, or low-value.
 
 Until then, confidence should be high in the implementation direction, not absolute in market fit.

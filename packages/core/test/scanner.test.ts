@@ -54,6 +54,29 @@ test("exports a portable vault with markdown fallbacks instead of raw canvas and
   assert.match(dashboard, /\[!note\] Dataview query/);
 });
 
+test("generated artifacts are readable smoke-test documents", async () => {
+  const report = await scanVault(path.join(fixtureRoot, "plugin-heavy"), { now: new Date("2026-01-01T00:00:00.000Z") });
+  const outDir = await fs.mkdtemp(path.join(os.tmpdir(), "brainbridge-core-"));
+  await writeBridgeArtifacts(report, { outDir, includeVaultCopy: true });
+
+  const expectedContent: Array<[string, RegExp]> = [
+    ["BrainBridge Report.md", /What Degrades Outside Obsidian/],
+    ["degrades-outside-obsidian.md", /Dataview block/],
+    ["plugin-dependencies.md", /dataview/],
+    ["tasks-index.md", /Write docs/],
+    ["properties-index.md", /No YAML frontmatter properties detected|#/],
+    [path.join("markdown-fallbacks", "Dashboard.md"), /Tasks query/],
+    [path.join("canvas-fallbacks", "boards", "Map.canvas.md"), /```mermaid/],
+    [path.join("base-fallbacks", "bases", "Tasks.base.md"), /static fallback/]
+  ];
+
+  for (const [relativePath, pattern] of expectedContent) {
+    const content = await fs.readFile(path.join(outDir, relativePath), "utf8");
+    assert.match(content, pattern, relativePath);
+    assert.doesNotMatch(content, /\[object Object\]/, relativePath);
+  }
+});
+
 test("rewrites resolved Obsidian links in exported markdown", async () => {
   const report = await scanVault(path.join(fixtureRoot, "basic"), { now: new Date("2026-01-01T00:00:00.000Z") });
   const outDir = await fs.mkdtemp(path.join(os.tmpdir(), "brainbridge-core-"));
